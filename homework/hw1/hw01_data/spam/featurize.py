@@ -22,7 +22,7 @@ the following keys:
 Please direct any bugs to kevintee@berkeley.edu
 '''
 
-from collections import defaultdict
+from collections import defaultdict, Counter
 import glob
 import re
 import scipy.io
@@ -142,6 +142,93 @@ def example_feature(text, freq):
 def freq_at_feature(text, freq):
     return text.count('@')
 
+#---spam---#
+def freq_td_feature(text, freq):
+    return float(freq['td'])
+
+def freq_nbsp_feature(text, freq):
+    return float(freq['nbsp'])
+
+def freq_src_feature(text, freq):
+    return float(freq['src'])
+
+def freq_cialis_feature(text, freq):
+    return float(freq['cialis'])
+
+def freq_img_feature(text, freq):
+    return float(freq['img'])
+
+def freq_htmlimg_feature(text, freq):
+    return float(freq['htmlimg'])
+
+def freq_intel_feature(text, freq):
+    return float(freq['intel'])
+
+def freq_free_feature(text, freq):
+    return float(freq['free'])
+
+def freq_or_feature(text, freq):
+    return float(freq['or'])
+
+def freq_3_feature(text, freq):
+    return float(freq['3'])
+
+def freq_underscore_feature(text, freq):
+    return float(freq['_'])
+
+def freq_our_feature(text, freq):
+    return float(freq['our'])
+
+def freq_http_feature(text, freq):
+    return float(freq['http'])
+
+def freq_all_feature(text, freq):
+    return float(freq['all'])
+
+#----Ham----#
+def freq_ect_feature(text, freq):
+    return float(freq['ect'])
+
+def freq_xls_feature(text, freq):
+    return float(freq['xls'])
+
+def freq_strangers_feature(text, freq):
+    return float(freq['strangers'])
+
+def freq_cotten_feature(text, freq):
+    return float(freq['cotten'])
+
+def freq_spreadsheet_feature(text, freq):
+    return float(freq['spreadsheet'])
+
+def freq_replica_feature(text, freq):
+    return float(freq['replica'])
+
+
+def freq_2000_feature(text, freq):
+    return float(freq['2000'])
+
+def freq_that_feature(text, freq):
+    return float(freq['that'])
+
+def freq_be_feature(text, freq):
+    return float(freq['be'])
+
+def freq_on_feature(text, freq):
+    return float(freq['on'])
+
+def freq_i_feature(text, freq):
+    return float(freq['i'])
+
+def freq_we_feature(text, freq):
+    return float(freq['we'])
+
+def freq_from_feature(text, freq):
+    return float(freq['from'])
+
+def freq_have_feature(text, freq):
+    return float(freq['have'])
+
 # Generates a feature vector
 def generate_feature_vector(text, freq):
     feature = []
@@ -180,6 +267,36 @@ def generate_feature_vector(text, freq):
 
     # --------- Add your own features here ---------
     # Make sure type is int or float
+    feature.append(freq_at_feature(text, freq))
+    '''
+    feature.append(freq_td_feature(text, freq))
+    feature.append(freq_nbsp_feature(text, freq))
+    feature.append(freq_src_feature(text, freq))
+    feature.append(freq_cialis_feature(text, freq))
+    feature.append(freq_img_feature(text, freq))
+    feature.append(freq_htmlimg_feature(text, freq))
+    feature.append(freq_intel_feature(text, freq))
+    feature.append(freq_ect_feature(text, freq))
+    feature.append(freq_xls_feature(text, freq))
+    feature.append(freq_free_feature(text, freq))
+    feature.append(freq_strangers_feature(text, freq))
+    feature.append(freq_replica_feature(text, freq))
+    feature.append(freq_spreadsheet_feature(text, freq))
+    '''
+    feature.append(freq_2000_feature(text, freq))
+    feature.append(freq_or_feature(text, freq))
+    feature.append(freq_3_feature(text, freq))
+    feature.append(freq_underscore_feature(text, freq))
+    feature.append(freq_that_feature(text, freq))
+    feature.append(freq_be_feature(text, freq))
+    feature.append(freq_our_feature(text, freq))
+    feature.append(freq_http_feature(text, freq))
+    feature.append(freq_all_feature(text, freq))
+    feature.append(freq_on_feature(text, freq))
+    feature.append(freq_i_feature(text, freq))
+    feature.append(freq_we_feature(text, freq))
+    feature.append(freq_from_feature(text, freq))
+    feature.append(freq_have_feature(text, freq))
 
     return feature
 
@@ -187,6 +304,8 @@ def generate_feature_vector(text, freq):
 # Each file is a single training example
 def generate_design_matrix(filenames):
     design_matrix = []
+    whole_freq = defaultdict(int)
+    
     for filename in filenames:
         with open(filename, "r", encoding='utf-8', errors='ignore') as f:
             text = f.read() # Read in text from file
@@ -195,18 +314,26 @@ def generate_design_matrix(filenames):
             word_freq = defaultdict(int) # Frequency of all words
             for word in words:
                 word_freq[word] += 1
+                whole_freq[word] += 1
 
-            # Create a feature vector
             feature_vector = generate_feature_vector(text, word_freq)
             design_matrix.append(feature_vector)
+
+
+    d = Counter(whole_freq)
+    # Create a feature vector
+    for k, v in d.most_common(50):
+        print (k, v)
     return design_matrix
 
 # ************** Script starts here **************
 # DO NOT MODIFY ANYTHING BELOW
 
 spam_filenames = glob.glob(BASE_DIR + SPAM_DIR + '*.txt')
+print("spam")
 spam_design_matrix = generate_design_matrix(spam_filenames)
 ham_filenames = glob.glob(BASE_DIR + HAM_DIR + '*.txt')
+print("ham")
 ham_design_matrix = generate_design_matrix(ham_filenames)
 # Important: the test_filenames must be in numerical order as that is the
 # order we will be evaluating your classifier
